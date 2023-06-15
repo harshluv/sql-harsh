@@ -1,0 +1,58 @@
+1. Which manufacturer's planes had most no of flights? And how many flights?
+
+select manufacturer,max(flight) from flights as f
+inner join planes as p
+on f.tailnum = p.tailnum
+group by manufacturer
+order by max(flight) desc
+
+2. Which manufacturer's planes had most no of flying hours? And how many hours?
+select manufacturer,max(flight_hr) from
+(
+select manufacturer,air_time,count(case when air_time is NULL then coalesce(air_time) else air_time end) as flight_hr 
+from flights as f
+inner join planes as p
+on f.tailnum = p.tailnum
+group by manufacturer,air_time
+) as m
+group by manufacturer
+order by max(flight_hr) desc
+
+3. Which plane flew the most number of hours? And how many hours?
+
+select * from
+(
+select manufacturer,air_time,rank() over(order by flight_hr desc) as rnk from
+(
+select manufacturer,air_time,count(case when air_time is NULL then coalesce(air_time) else air_time end) as flight_hr 
+from flights as f
+inner join planes as p
+on f.tailnum = p.tailnum
+group by manufacturer,air_time
+) as m
+) as n
+where rnk = 1
+
+4. Which destination had most delay in flights?
+select * from
+(
+select dest, rank() over(order by max(arr_delay)) as rnk 
+from flights 
+group by dest
+) as m
+where rnk = 1
+
+5. Which manufactures planes had covered most distance? And how much distance?
+
+select * from
+(
+select  manufacturer, distance,rank() over(order by max(distance)desc) as rnk from flights as f
+inner join planes as p
+on f.tailnum = p.tailnum
+group by manufacturer, distance
+) as m
+where rnk = 1
+
+
+
+
