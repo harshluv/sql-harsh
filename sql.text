@@ -7,6 +7,7 @@ group by manufacturer
 order by max(flight) desc
 
 2. Which manufacturer's planes had most no of flying hours? And how many hours?
+
 select manufacturer,max(flight_hr) from
 (
 select manufacturer,air_time,count(case when air_time is NULL then coalesce(air_time) else air_time end) as flight_hr 
@@ -34,6 +35,7 @@ group by manufacturer,air_time
 where rnk = 1
 
 4. Which destination had most delay in flights?
+
 select * from
 (
 select dest, rank() over(order by max(arr_delay)) as rnk 
